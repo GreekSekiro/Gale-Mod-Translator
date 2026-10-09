@@ -1,0 +1,22 @@
+# 运行时生成，不纳入版本管理
+data/
+logs/
+config.json
+
+# 打包产物
+dist/
+*.zip
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+
+# 抓取夹具时的临时产物
+test/.tmp/
+
+# 运行时生成的机器相关文件（含绝对路径，运行时自动重建）
+tools/launch-gale.vbs
+tools/service-hidden.vbs
+接管原Gale快捷方式-需管理员.cmd

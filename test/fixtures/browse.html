@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="gale-route" content="/browse">
+<title>Gale · browse（合成夹具）</title>
+<style>
+  body{margin:0;font:14px/1.5 system-ui,sans-serif;background:#15181d;color:#e6e9ee}
+  nav.topbar{display:flex;gap:8px;padding:10px 14px;border-bottom:1px solid #262c35}
+  nav.topbar button{background:#222832;color:#e6e9ee;border:1px solid #333a45;border-radius:6px;padding:5px 10px}
+  .card{display:flex;gap:12px;padding:12px 14px;border-bottom:1px solid #222832}
+  .card img{width:48px;height:48px;background:#2a313a;border-radius:8px}
+  .card .byline{color:#8b95a3;font-size:12px}
+  .card .tags{display:flex;gap:6px;margin-top:6px}
+  .card .tags button{background:#2a313a;color:#c8d0da;border:0;border-radius:999px;padding:2px 9px;font-size:12px}
+  .detail{padding:16px 18px}
+  .markdown h2{margin:0 0 8px;font-size:16px}
+  .markdown pre{background:#0d1014;border:1px solid #262c35;border-radius:8px;padding:10px;overflow:auto}
+</style>
+</head>
+<body>
+<nav class="topbar">
+  <button>Browse</button>
+  <button>Installed</button>
+  <button>Modpacks</button>
+  <input type="text" placeholder="Search mods">
+</nav>
+
+<svelte-virtual-list-contents>
+  <div class="card">
+    <img src="data:," alt="">
+    <div class="body">
+      <a class="name" href="/package/Azumatt/PlantEasily"><h3>PlantEasily</h3></a>
+      <div class="byline">by Azumatt</div>
+      <p class="desc">Plant multiple crops at once and harvest everything with a single click.</p>
+      <div class="tags"><button>Quality of Life</button><button>Client-side</button></div>
+    </div>
+  </div>
+  <div class="card">
+    <img src="data:," alt="">
+    <div class="body">
+      <a class="name" href="/package/denikson/BepInExPack_Valheim"><h3>BepInExPack Valheim</h3></a>
+      <div class="byline">by denikson</div>
+      <p class="desc">BepInEx pack for Valheim. Preconfigured and includes unstripped Unity DLLs.</p>
+      <div class="tags"><button>Libraries</button><button>Server-side</button></div>
+    </div>
+  </div>
+</svelte-virtual-list-contents>
+
+<main class="detail">
+  <div class="markdown">
+    <h2>Installation</h2>
+    <p>Extract the archive into your BepInEx\plugins folder, then launch the game.</p>
+    <p>Requires <a href="https://example.com">BepInExPack Valheim</a> to be installed first.</p>
+    <pre><code>dotnet build -c Release</code></pre>
+  </div>
+</main>
+</body>
+</html>

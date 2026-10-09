@@ -1,0 +1,23 @@
+{
+  "route": "/modpack",
+  "mode": "normal",
+  "counts": {
+    "identifier": 3,
+    "translatable": 2,
+    "ui-chrome": 1
+  },
+  "candidates": [
+    "My Modpack",
+    "This modpack bundles 42 mods for a smoother Valheim experience."
+  ],
+  "classified": {
+    "identifier": [
+      "BepInEx\\config\\Azumatt.AzuCraftyBoxes.cfg",
+      "BepInEx\\plugins\\PlantEasily.dll",
+      "README.md"
+    ],
+    "ui-chrome": [
+      "Modpacks"
+    ]
+  }
+}

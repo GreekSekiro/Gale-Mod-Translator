@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="gale-route" content="/config">
+<title>Gale · config（合成夹具）</title>
+<style>
+  body{margin:0;font:14px/1.5 system-ui,sans-serif;background:#15181d;color:#e6e9ee;display:flex;height:100vh}
+  nav{position:absolute;top:0;left:0;right:0;padding:8px 12px;border-bottom:1px solid #262c35}
+  .config{display:flex;width:100%;padding-top:44px}
+  aside.sidebar{width:240px;border-right:1px solid #262c35;padding:10px;display:flex;flex-direction:column;gap:4px}
+  aside.sidebar button{text-align:left;background:#1b2027;color:#e6e9ee;border:1px solid #262c35;border-radius:6px;padding:7px 10px}
+  section.pane{padding:14px 18px}
+  .key{font-family:Consolas,monospace;color:#9aa4b2;margin-top:8px}
+</style>
+</head>
+<body>
+<nav><button>Back</button></nav>
+<div class="config">
+  <aside class="sidebar">
+    <button class="mod">AzuCraftyBoxes</button>
+    <button class="group">Achievements</button>
+    <button class="group">Craft From Chests</button>
+    <button class="file">Azumatt.AzuCraftyBoxes.yml</button>
+    <button class="file">zenox.betterui</button>
+  </aside>
+  <section class="pane">
+    <h2>Craft From Chests</h2>
+    <p class="help">When enabled, you can craft items using materials stored in nearby chests.</p>
+    <div class="key">EnableFeature</div>
+    <div class="key">MaxRange</div>
+  </section>
+</div>
+</body>
+</html>

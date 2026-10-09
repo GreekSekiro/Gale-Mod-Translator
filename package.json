@@ -1,0 +1,38 @@
+{
+  "name": "gale-mod-translator",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Gale Mod Translator（原 Gale 汉化外挂）：不改动 Gale 任何文件，通过 WebView2 调试端口 + CDP 注入页面脚本，给 Gale（Thunderstore 的 mod 管理器）做实时汉化",
+  "keywords": ["gale", "thunderstore", "mod-manager", "translation", "chinese", "webview2", "cdp"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GreekSekiro/Gale-Mod-Translator.git"
+  },
+  "homepage": "https://github.com/GreekSekiro/Gale-Mod-Translator#readme",
+  "bugs": {
+    "url": "https://github.com/GreekSekiro/Gale-Mod-Translator/issues"
+  },
+  "author": "GreekSekiro",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node core/launcher.mjs",
+    "stop": "node core/stop.mjs",
+    "test": "node tools/test-fuzzy.mjs && node tools/test-ports.mjs && node tools/test-i18n.mjs && node tools/test-ratelimit.mjs && node tools/test-edge.mjs && node tools/test-edge-worker.mjs && node tools/replay-test.mjs && node tools/test-integration.mjs && node tools/test-scroll.mjs",
+    "test:fuzzy": "node tools/test-fuzzy.mjs",
+    "test:ports": "node tools/test-ports.mjs",
+    "test:i18n": "node tools/test-i18n.mjs",
+    "test:ratelimit": "node tools/test-ratelimit.mjs",
+    "test:edge": "node tools/test-edge.mjs",
+    "test:scroll": "node tools/test-scroll.mjs",
+    "test:builtin": "node tools/test-builtin.mjs",
+    "test:edgeworker": "node tools/test-edge-worker.mjs",
+    "test:replay": "node tools/replay-test.mjs",
+    "test:integration": "node tools/test-integration.mjs",
+    "replay:print": "node tools/replay-test.mjs --print",
+    "replay:update": "node tools/replay-test.mjs --update",
+    "snapshot": "node tools/snapshot.mjs",
+    "package": "node tools/package.mjs"
+  }
+}

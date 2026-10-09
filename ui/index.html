@@ -1,0 +1,1215 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="color-scheme" content="dark" />
+<title>Gale 汉化外挂 · 设置</title>
+<style>
+  /* 主题 token：与 core/i18n.js 的 THEME 完全一致（tools/test-i18n.mjs 会断言两份相等）。
+     这里字面写一份是为了首屏不闪白；改色请两边一起改。
+     设置页**固定用暗色**那套：Gale 默认就是暗色皮肤（slate + green），两边看着像同一个软件。
+     亮色 token 仍留在 THEME.light 里，给「Gale 切成亮色时」注入的悬浮条 / 抽屉用。 */
+  :root{
+    --g-bg:#0f172a;--g-bg-a:rgba(15,23,42,.72);--g-surface:#1e293b;--g-surface-a:rgba(30,41,59,.94);
+    --g-surface-2:#273449;--g-line:#334155;--g-line-soft:#243044;--g-fg:#f1f5f9;--g-fg-2:#cbd5e1;--g-dim:#94a3b8;
+    --g-acc:#16a34a;--g-acc-hi:#22c55e;--g-acc-soft:rgba(34,197,94,.16);--g-acc-fg:#ffffff;
+    --g-ok:#22c55e;--g-warn:#f59e0b;--g-warn-bg:#3b2a0d;--g-err:#ef4444;--g-err-bg:#3b1d1d;--g-err-fg:#fecaca;
+    --g-shadow:0 12px 32px rgba(2,6,23,.55);--g-code-bg:#0b1220;
+    --g-r:12px;--g-r-sm:9px;--g-r-xs:7px;--g-r-pill:999px;
+    --g-font:"Microsoft YaHei UI","Microsoft YaHei","Segoe UI",Inter,system-ui,-apple-system,sans-serif;
+    --g-mono:Consolas,"Cascadia Mono",monospace;
+    --g-fs:14px;--g-fs-sm:12.5px;--g-fs-xs:11.5px;--g-fs-lg:15px;--g-fs-xl:17px;
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--g-bg);color:var(--g-fg);font:15px/1.65 var(--g-font)}
+  /* 顶栏与内容区共用同一个 max-width + 居中：宽屏下标题不会孤零零贴在屏幕最左边 */
+  header{border-bottom:1px solid var(--g-line);background:var(--g-surface-a);backdrop-filter:blur(8px);position:sticky;top:0;z-index:5}
+  header .wrap{max-width:1120px;margin:0 auto;padding:20px 28px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  header h1{margin:0;font-size:20px;font-weight:650;letter-spacing:.2px}
+  header span{color:var(--g-dim);font-size:13px}
+  /* minmax(0,1fr)：grid 轨道默认按 min-content 算，页面里只要有一行不换行的长文本
+     （例如节点说明）就会把整列撑宽、整页出现横向滚动条。锁死成 0 起步，让它按 1120 排。 */
+  main{width:100%;max-width:1120px;margin:0 auto;padding:24px 28px 72px;display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+  .card{background:var(--g-surface);border:1px solid var(--g-line);border-radius:var(--g-r);padding:18px 20px;box-shadow:0 1px 2px rgba(2,6,23,.35)}
+  .card h2{margin:0 0 14px;font-size:16px;font-weight:650;display:flex;align-items:center;gap:10px;justify-content:space-between}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:12px 20px}
+  label{display:block;color:var(--g-dim);font-size:13px;margin-bottom:5px}
+  input[type=text],input[type=password],input[type=number],select,textarea{width:100%;background:var(--g-bg);border:1px solid var(--g-line);color:var(--g-fg);border-radius:var(--g-r-sm);padding:8px 11px;font:14px/1.5 var(--g-font)}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--g-acc);box-shadow:0 0 0 3px var(--g-acc-soft)}
+  textarea{min-height:92px;resize:vertical;font-family:var(--g-mono);font-size:13px}
+  button{background:var(--g-acc);color:var(--g-acc-fg);border:0;border-radius:var(--g-r-sm);padding:9px 16px;cursor:pointer;font:600 14px var(--g-font);transition:filter .15s,transform .05s}
+  button.ghost{background:transparent;border:1px solid var(--g-line);color:var(--g-fg-2);font-weight:500}
+  button.mini{padding:5px 11px;font-size:12.5px;border-radius:var(--g-r-xs)}
+  button.danger{background:var(--g-err-bg);border:1px solid var(--g-err);color:var(--g-err-fg)}
+  button:hover{filter:brightness(1.08)}
+  button:active{transform:translateY(1px)}
+  select{cursor:pointer}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .stat{display:flex;gap:22px;flex-wrap:wrap;color:var(--g-dim);font-size:12.5px}
+  .stat b{display:block;color:var(--g-fg);font-size:16px;font-weight:650}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--g-dim);margin-right:6px}
+  .dot.ok{background:var(--g-ok)}.dot.err{background:var(--g-err)}.dot.warn{background:var(--g-warn)}
+  pre{background:var(--g-code-bg);border:1px solid var(--g-line);border-radius:var(--g-r-sm);padding:12px;max-height:280px;overflow:auto;font-size:12.5px;white-space:pre-wrap}
+  .hint{color:var(--g-dim);font-size:12.5px;margin-top:6px;line-height:1.6}
+  .tip{border-left:3px solid var(--g-warn);padding-left:12px;color:var(--g-dim);font-size:12.5px;line-height:1.6}
+  code{background:var(--g-code-bg);padding:1px 6px;border-radius:5px;font-size:12.5px;font-family:var(--g-mono)}
+  .src{display:flex;align-items:center;gap:12px;border:1px solid var(--g-line);border-radius:var(--g-r-sm);padding:10px 13px;margin-bottom:9px}
+  .src.on{border-color:var(--g-acc);background:var(--g-acc-soft)}
+  .src .body{flex:1;cursor:pointer;min-width:0}
+  .src .n{font-weight:600;font-size:14.5px}
+  /* 说明文案允许换行：以前是 nowrap + 省略号，长说明看不到后半句，而且会把整页撑宽 */
+  .src .d{color:var(--g-dim);font-size:12.5px;line-height:1.5;margin-top:2px}
+  .toast{position:fixed;right:20px;bottom:20px;background:var(--g-surface);border:1px solid var(--g-line);padding:12px 16px;border-radius:var(--g-r);opacity:0;transition:.25s;pointer-events:none;z-index:9;box-shadow:var(--g-shadow);font-size:14px}
+  .toast.show{opacity:1}
+  details{border:1px dashed var(--g-line);border-radius:var(--g-r-sm);padding:12px 14px;margin-top:10px}
+  summary{cursor:pointer;color:var(--g-acc-hi);font-size:14px}
+  .bar{height:8px;border-radius:var(--g-r-pill);background:var(--g-line);overflow:hidden}
+  .bar>i{display:block;height:100%;width:0;background:var(--g-acc-hi);transition:width .3s}
+  .bar.indet>i{width:35%;animation:galeIndet 1.1s ease-in-out infinite}
+  @keyframes galeIndet{0%{transform:translateX(-100%)}100%{transform:translateX(320%)}}
+  .prog{color:var(--g-dim);font-size:12.5px;margin-top:6px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+  <h1>Gale 汉化外挂</h1>
+  <span id="ver"></span>
+  <span>把 Gale 里的英文实时翻译成你选择的语言 · 不改动 Gale 任何文件</span>
+  <select id="uiLang" title="界面语言 / UI language" style="width:auto;margin-left:auto">
+    <option value="zh-CN">简体中文</option>
+    <option value="en">English</option>
+  </select>
+  </div>
+</header>
+<main>
+  <div class="card" id="healthBanner" style="display:none;border-color:var(--g-err);background:var(--g-err-bg)">
+    <h2 style="margin-bottom:6px">⚠ 注入自检异常（可能 Gale 前端结构已变化）</h2>
+    <div id="healthBannerMsg" class="hint"></div>
+    <div class="row" style="margin-top:8px">
+      <button class="ghost mini" id="btnHealthBanner">看覆盖率体检</button>
+      <button class="ghost mini" id="btnReinject2">重新注入并刷新</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2>运行状态</h2>
+    <div class="stat" id="stats"></div>
+    <div class="tip" id="portNote" style="display:none;margin-top:10px"></div>
+    <div class="tip" id="rateNote" style="display:none;margin-top:10px"></div>
+    <div class="tip" id="nodeNote" style="display:none;margin-top:10px"></div>
+    <div class="grid" style="margin-top:12px">
+      <div><label>Gale 程序路径（换电脑后点“自动检测”）</label>
+        <div class="row"><input type="text" id="galePath" style="flex:1" /><button class="ghost mini" id="btnDetect">自动检测</button></div>
+      </div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button id="btnReinject" class="ghost">重新注入并刷新 Gale 页面</button>
+      <button id="btnLaunch" class="ghost">以调试模式启动 Gale</button>
+      <button id="btnDiag" class="ghost">查看页面识别情况</button>
+    </div>
+    <pre id="diagOut" style="display:none"></pre>
+  </div>
+
+  <div class="card">
+    <h2><span>免启动器模式</span><span class="hint" id="sysState"></span></h2>
+    <p class="hint">开启后桌面会多一个「Gale 汉化」快捷方式：双击它即自动拉起后台服务与带调试端口的 Gale。
+      再打开「开机自启」，登录后服务就在后台待命，你之后怎么启动 Gale 都能被接管。
+      原有快捷方式位于公共桌面/开始菜单，改它们需要管理员权限；项目根目录会生成一个提权脚本可按需使用。</p>
+    <div class="row" style="margin-top:10px">
+      <button id="btnSystemOn">开启免启动器模式</button>
+      <button class="ghost" id="btnSystemOff">还原</button>
+      <button class="ghost" id="btnAutostartOn">开启开机自启</button>
+      <button class="ghost" id="btnAutostartOff">关闭开机自启</button>
+    </div>
+    <pre id="sysOut" style="display:none"></pre>
+  </div>
+
+  <div class="card">
+    <h2><span>覆盖率体检</span><span class="hint">看哪些英文没翻、以及为什么没翻</span></h2>
+    <div class="row">
+      <button id="btnHealth">体检当前页面</button>
+      <button class="ghost" id="btnHealthAll">体检全部页面（约 30 秒）</button>
+      <span class="hint" id="healthHint"></span>
+    </div>
+    <div id="healthOut" style="margin-top:10px"></div>
+  </div>
+
+  <div class="card">
+    <h2><span>译法比对与润色</span><span class="hint" id="qState"></span></h2>
+    <div class="grid">
+      <div><label>翻译模式</label>
+        <select id="qMode">
+          <option value="fast">快速（单节点直出，省请求）</option>
+          <option value="best">择优（多节点并发翻译 + 质量评分选最好）</option>
+        </select></div>
+      <div><label>参与择优的节点 id（逗号分隔，留空=自动取可用节点）</label>
+        <input type="text" id="qVoters" placeholder="tencent, google" /></div>
+      <div><label>译法一致性（与已有相似译法保持一致）</label>
+        <select id="qConsistency"><option value="true">开</option><option value="false">关</option></select></div>
+    </div>
+    <div class="hint">择优只作用于列表简介、详情摘要、标签这类短文本；README 长正文仍走单节点，避免请求量翻几倍。</div>
+
+    <div style="margin-top:14px;border-top:1px dashed var(--g-line);padding-top:12px">
+      <label>对比译法（同一段文本让所有可用节点各翻一遍并打分）</label>
+      <div class="row">
+        <input type="text" id="cmpText" style="flex:1" value="Adds loot drops, magic items, and enchanting to Valheim." />
+        <label style="margin:0;display:flex;align-items:center;gap:4px"><input type="checkbox" id="cmpVerify" style="width:auto" /> 回译校验</label>
+        <button id="btnCompare">对比</button>
+      </div>
+      <div id="cmpOut" style="margin-top:8px"></div>
+    </div>
+
+    <div style="margin-top:14px;border-top:1px dashed var(--g-line);padding-top:12px">
+      <label>LLM 润色（机翻先上屏，再用大模型润色并自动替换，无需刷新）</label>
+      <div class="grid">
+        <div><label>开关</label><select id="polishEnabled"><option value="false">关</option><option value="true">开</option></select></div>
+        <div><label>最短润色长度（字符）</label><input type="number" id="polishMinLen" min="1" /></div>
+        <div><label>每批段数</label><input type="number" id="polishBatch" min="1" max="20" /></div>
+      </div>
+      <div class="hint">使用「翻译节点」里 OpenAI 兼容节点的接口地址 / Key / 模型；未配置时本功能自动跳过。</div>
+      <div class="row" style="margin-top:8px"><button class="ghost mini" id="btnPolishTest">测试润色</button><span class="hint" id="polishOut"></span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span>公共译库</span><span class="hint" id="libState"></span></h2>
+    <p class="hint">译库是「与翻译节点无关」的共享译文层：导出成文件发给朋友、或传到网盘 / Gist，对方导入或订阅后，
+      遇到相同内容直接出中文，<b>零网络请求</b>。你浏览过的内容会自动进译库。</p>
+    <div class="grid" style="margin-top:10px">
+      <div><label>导出：目标语言（留空=全部）</label><input type="text" id="libTarget" placeholder="zh-CN" /></div>
+      <div><label>导出：限定游戏（留空=全部）</label><input type="text" id="libGame" placeholder="Valheim" /></div>
+      <div><label>导出时包含节点缓存里的历史译文</label>
+        <select id="libIncludeCache"><option value="true">包含（推荐，条数最多）</option><option value="false">只导出译库</option></select></div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button id="btnLibExport">导出译库文件</button>
+      <span class="hint" id="libOut"></span>
+    </div>
+    <div style="margin-top:12px;border-top:1px dashed var(--g-line);padding-top:12px">
+      <label>导入：本地文件 / 网址（支持别处导出的译库文件，也支持对方整个 library.json）</label>
+      <div class="row">
+        <input type="text" id="libImportPath" style="flex:1" placeholder="D:\path\gale-lib-zh-CN-all-1234.json 或 https://.../lib.json" />
+        <input type="file" id="libFile" accept=".json" style="width:auto" />
+        <button class="ghost" id="btnLibImport">导入</button>
+      </div>
+      <div class="hint">导入默认不覆盖已有译文（只补缺）：
+        <label style="display:inline"><input type="checkbox" id="libOverwrite" style="width:auto" /> 改成覆盖同名条目</label></div>
+    </div>
+    <div style="margin-top:12px;border-top:1px dashed var(--g-line);padding-top:12px">
+      <label>订阅（每行一个网址，点“保存并更新订阅”会全部拉取并合并）</label>
+      <textarea id="libSubs" style="min-height:56px" placeholder="https://gist.githubusercontent.com/.../gale-lib-zh-CN.json"></textarea>
+      <div class="row" style="margin-top:8px">
+        <button class="ghost" id="btnLibSubs">保存并更新订阅</button>
+        <button class="ghost" id="btnLibClear">清空译库</button>
+        <span class="hint" id="libSubOut"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>语言与网络</h2>
+    <div class="grid">
+      <div><label>翻译成</label><select id="target"></select></div>
+      <div><label>源语言</label><select id="source"></select></div>
+      <div><label>网络代理（Google / DeepL / 大模型等境外节点需要）</label>
+        <div class="row">
+          <input type="text" id="proxy" style="flex:1" placeholder="system / http://127.0.0.1:7892 / socks5://127.0.0.1:10808" />
+          <button class="ghost mini" id="btnSysProxy">跟随系统代理</button>
+          <button class="ghost mini" id="btnDetectProxy">自动检测</button>
+        </div>
+        <div class="hint" id="proxyOut"></div>
+      </div>
+      <div><label>失败时的备用节点（逗号分隔的节点 id）</label><input type="text" id="fallback" placeholder="tencent, youdao" /></div>
+    </div>
+    <div class="hint">术语保护、固定译法、后处理替换、中英混排空格都是中文专用；目标语言不是中文时会自动跳过。</div>
+  </div>
+
+  <div class="card">
+    <h2><span>翻译节点</span><span class="hint" id="srcCount"></span></h2>
+    <label style="display:flex;align-items:center;gap:6px">
+      <input type="checkbox" id="offlineOnly" style="width:auto" /> 仅本地翻译（禁用联网）
+    </label>
+    <div class="hint" id="offlineNote" style="margin:4px 0 10px"></div>
+    <div id="providers"></div>
+    <div id="srcFields" style="display:none;margin-top:10px;border-top:1px dashed var(--g-line);padding-top:12px">
+      <label id="srcFieldsTitle"></label>
+      <div class="grid" id="srcFieldsGrid"></div>
+      <div class="row" style="margin-top:8px">
+        <button class="mini" id="btnSaveFields">保存参数</button>
+        <span class="hint" id="fieldsOut"></span>
+      </div>
+    </div>
+    <div id="localBox" style="display:none;margin-top:10px;border-top:1px dashed var(--g-line);padding-top:12px">
+      <div class="tip" id="localState"></div>
+      <div id="localProgWrap" style="display:none;margin-top:8px">
+        <div class="bar" id="localBar"><i id="localBarFill"></i></div>
+        <div class="prog" id="localProgText"></div>
+      </div>
+      <div class="hint" id="localDiag" style="display:none;margin-top:6px;opacity:.75"></div>
+      <div class="row" style="margin-top:8px">
+        <button class="mini" id="btnEnableLocal">启用内置引擎</button>
+        <button class="ghost" id="btnRecheckLocal">下载语言包</button>
+        <button class="ghost" id="btnResetLocal">重置引擎</button>
+        <span class="hint" id="localOut"></span>
+      </div>
+    </div>
+    <!-- 同页内抽屉：语言包管理是磁盘操作，跟选中的节点、引擎能否使用都无关，所以常驻在 #localBox 外面 -->
+    <div id="localPackRow" style="margin-top:10px">
+      <div class="hint">内置引擎语言包（模型跑在插件拉起的无窗口 Edge 里，与当前所选翻译节点无关）：</div>
+      <div class="hint" id="localPackInfo"></div>
+      <div class="row" style="margin-top:6px">
+        <button class="ghost" id="btnScanPack">查看语言包占用</button>
+        <button class="ghost" id="btnOpenPack">打开语言包位置</button>
+        <button class="ghost" id="btnDelPack">删除语言包</button>
+      </div>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button id="btnTest">测试当前节点</button>
+      <button class="ghost" id="btnRestore">恢复所有被停用的内置节点</button>
+      <span id="testOut" class="hint"></span>
+    </div>
+
+    <details id="addBox">
+      <summary>➕ 添加自定义翻译节点</summary>
+      <div class="grid" style="margin-top:10px">
+        <div><label>节点名称</label><input type="text" id="cs_name" placeholder="我的翻译接口" /></div>
+        <div><label>节点 id（英文标识）</label><input type="text" id="cs_id" placeholder="my-api" /></div>
+        <div><label>请求地址</label><input type="text" id="cs_url" placeholder="https://api.example.com/translate" /></div>
+        <div><label>请求方法</label><select id="cs_method"><option>POST</option><option>GET</option></select></div>
+      </div>
+      <div style="margin-top:10px"><label>请求头（JSON）</label>
+        <textarea id="cs_headers" style="min-height:64px">{"Content-Type":"application/json","Authorization":"Bearer {{key}}"}</textarea></div>
+      <div style="margin-top:10px"><label>请求体模板</label>
+        <textarea id="cs_body" style="min-height:70px">{"text":{{texts_json}},"source":"{{source}}","target":"{{target}}"}</textarea></div>
+      <div class="grid" style="margin-top:10px">
+        <div><label>响应取值路径</label><input type="text" id="cs_path" placeholder="translations[].text" /></div>
+        <div><label>API Key（可选）</label><input type="password" id="cs_key" /></div>
+        <div><label>批量发送</label><select id="cs_batch"><option value="true">是（请求体含 texts_json / texts_joined）</option><option value="false">否（每段一次请求，用 {{text}}）</option></select></div>
+        <div><label>备注</label><input type="text" id="cs_note" /></div>
+      </div>
+      <div class="hint">可用占位符：<code>{{text}}</code> 单段文本 · <code>{{texts_json}}</code> JSON 数组 · <code>{{texts_joined}}</code> 换行拼接 · <code>{{texts_count}}</code> 段数 · <code>{{source}}</code> · <code>{{target}}</code> · <code>{{key}}</code></div>
+      <div class="row" style="margin-top:10px"><button id="btnAddCustom">添加节点</button></div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h2>术语与译文处理</h2>
+    <div class="grid">
+      <div><label>最小翻译长度（字符）</label><input type="number" id="minLen" min="1" max="20" /></div>
+      <div><label>模组名也翻译</label>
+        <select id="translateNames"><option value="false">否（推荐，保留原名便于搜索）</option><option value="true">是</option></select></div>
+      <div><label>翻译模组配置页（左侧列表与配置标题）</label>
+        <select id="translateConfigPage"><option value="true">开（推荐）</option><option value="false">关</option></select></div>
+      <div><label>中文搜索（输入中文给出英文关键词）</label>
+        <select id="chineseSearch"><option value="true">开（推荐）</option><option value="false">关</option></select></div>
+      <div><label>模糊复用（只差版本号/标点的句子复用已有译文）</label>
+        <select id="fuzzyReuse"><option value="true">开（推荐，省请求）</option><option value="false">关</option></select></div>
+      <div><label>鼠标悬停显示原文</label>
+        <select id="hoverOriginal"><option value="true">是</option><option value="false">否</option></select></div>
+      <div><label>启动时自动打开 Gale</label>
+        <select id="autoLaunchGale"><option value="true">是</option><option value="false">否</option></select></div>
+    </div>
+    <div style="margin-top:12px">
+      <label>术语保护表（每行一个，这些词不会被翻译；可写成 <code>原文 = 译文</code> 强制指定译法）</label>
+      <textarea id="glossary"></textarea>
+    </div>
+    <div style="margin-top:12px">
+      <label>固定译法（每行一条 <code>原文 = 译文</code>；整段完全匹配时直接采用，不调用翻译接口）</label>
+      <textarea id="phraseMap" style="min-height:110px"></textarea>
+    </div>
+    <div style="margin-top:12px">
+      <label>译文后处理替换（每行一条 <code>原文 = 译文</code>，用于纠正机翻惯用译名）</label>
+      <textarea id="postReplace" style="min-height:60px"></textarea>
+    </div>
+    <div class="row" style="margin-top:12px"><button id="btnSave">保存设置</button><span class="hint">保存后立即生效，不会刷新 Gale 页面</span></div>
+  </div>
+
+  <div class="card">
+    <h2>缓存</h2>
+    <div class="stat" id="cacheStats"></div>
+    <div class="row" style="margin-top:10px">
+      <button class="ghost" id="btnClearCache">清空缓存</button>
+      <span class="hint">已翻译过的内容不会重复请求翻译接口，断网也能显示。缓存按“目标语言 + 节点”分开存放。</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>使用说明</h2>
+    <p class="tip">必须通过本项目的 <code>start.cmd</code> 启动 Gale，外挂才能挂载（已经开启「免启动器模式」时，用桌面快捷方式启动也可以）。若 Gale 已在运行（包括托盘图标），请先完全退出，再运行 start.cmd。</p>
+    <p>页面右下角会出现悬浮控制条：<b>中文/原文</b> 一键切换、<b>⋯</b> 展开节点切换与计数、<b>⚙</b> 打开本页面；控制条可拖动，位置会记住。</p>
+    <p>更新 Gale 版本后无需重新安装：外挂不修改 Gale 的任何文件，只依赖 WebView2 调试端口与页面文本特征。若某次更新后失效，点“查看页面识别情况”把结果发出来即可快速适配。</p>
+    <p>换到新电脑：解压后双击 <code>start.cmd</code>；若提示找不到 Gale，点上方的“自动检测”或手工填写路径。</p>
+  </div>
+
+  <div class="card">
+    <h2>日志</h2>
+    <pre id="events"></pre>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+<script src="/i18n.js"></script>
+<script>
+const $ = (id) => document.getElementById(id);
+const API = location.origin;
+const I18N = window.GALE_I18N;
+let CFG = {}, PROVIDERS = [], LANGS = [];
+
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); applyI18n(); }
+async function api(p, body){
+  const r = await fetch(API+p, {method: body===undefined?'GET':'POST', headers:{'Content-Type':'application/json'}, body: body===undefined?undefined:JSON.stringify(body)});
+  return r.json();
+}
+const linesToGlossary = (txt) => txt.split('\n').map(s=>s.trim()).filter(Boolean).map(s=>{
+  const m = s.split('='); return m.length>1 ? {from:m[0].trim(), to:m.slice(1).join('=').trim()} : s;
+});
+const linesToRules = (txt) => txt.split('\n').map(s=>s.trim()).filter(Boolean).map(s=>{
+  const m = s.split('='); return {from:(m[0]||'').trim(), to:m.slice(1).join('=').trim()};
+}).filter(r=>r.from);
+
+function fillLangs(){
+  const fill = (sel, withAuto) => {
+    sel.innerHTML = '';
+    if (withAuto) sel.insertAdjacentHTML('beforeend', '<option value="auto">自动检测</option>');
+    for (const l of LANGS) sel.insertAdjacentHTML('beforeend', `<option value="${l.code}">${l.name}（${l.code}）</option>`);
+    if (!withAuto) sel.insertAdjacentHTML('beforeend', '<option value="__custom">其他（手动输入语言代码）…</option>');
+  };
+  fill($('target'), false);
+  fill($('source'), true);
+}
+
+function renderProviders(){
+  const box = $('providers'); box.innerHTML = '';
+  $('srcCount').textContent = `共 ${PROVIDERS.length} 个可用`;
+  const off = !!CFG.offlineOnly;
+  for (const p of PROVIDERS){
+    const blocked = off && p.local === false;
+    const d = document.createElement('div');
+    d.className = 'src' + ((p.id===CFG.provider) ? ' on':'');
+    d.innerHTML = `<div class="body"><div class="n">${p.name}${p.custom?' <span class="hint">[自定义]</span>':''}${blocked?' <span class="hint">[仅本地模式下已停用]</span>':''}</div><div class="d">${p.note||''}</div></div>`;
+    d.querySelector('.body').onclick = async () => {
+      if (blocked) { toast('仅本地模式已开启：这个节点会把文本发到本机之外，已被停用。要用它请先关掉「仅本地翻译」。'); return; }
+      CFG.provider = p.id; await api('/api/config',{provider:p.id}); renderProviders(); toast('已切换到：'+p.name);
+    };    if (p.custom){
+      const edit = document.createElement('button'); edit.className='ghost mini'; edit.textContent='编辑';
+      edit.onclick = (e)=>{ e.stopPropagation();
+        const s=(CFG.customSources||[]).find(x=>'custom:'+x.id===p.id)||{};
+        $('addBox').open=true;
+        $('cs_name').value=s.name||''; $('cs_id').value=s.id||''; $('cs_url').value=s.url||''; $('cs_method').value=s.method||'POST';
+        $('cs_headers').value=s.headers||''; $('cs_body').value=s.body||''; $('cs_path').value=s.responsePath||'';
+        $('cs_key').value=s.key||''; $('cs_batch').value=String(s.batch!==false); $('cs_note').value=s.note||'';
+        $('btnAddCustom').textContent='保存修改'; $('btnAddCustom').dataset.editing=s.id||''; };
+      const del = document.createElement('button'); del.className='danger mini'; del.textContent='删除';
+      del.onclick = async (e)=>{ e.stopPropagation(); if(!confirm('删除自定义节点「'+p.name+'」？')) return;
+        const list=(CFG.customSources||[]).filter(x=>'custom:'+x.id!==p.id); CFG.customSources=list;
+        await api('/api/config',{customSources:list});
+        if(CFG.provider===p.id){ CFG.provider='builtin'; await api('/api/config',{provider:'builtin'}); }
+        await refreshConfig(); toast('已删除'); };
+      d.appendChild(edit); d.appendChild(del);
+    } else if (p.id!=='cache-only'){
+      const off = document.createElement('button'); off.className='ghost mini'; off.textContent='停用';
+      off.onclick = async (e)=>{ e.stopPropagation();
+        const list=[...(CFG.disabledSources||[]), p.id];
+        await api('/api/config',{disabledSources:list});
+        if(CFG.provider===p.id){ CFG.provider='builtin'; await api('/api/config',{provider:'builtin'}); }
+        await refreshConfig(); toast('已停用 '+p.name); };
+      d.appendChild(off);
+    }
+    box.appendChild(d);
+  }
+  renderOfflineNote();
+  renderProviderFields();
+}
+
+/** 「仅本地翻译（禁用联网）」下面那行说明 */
+function renderOfflineNote(){
+  const el = $('offlineNote');
+  if (!el) return;
+  const off = !!CFG.offlineOnly;
+  if (!off){
+    el.textContent = '关闭时可以用在线节点（腾讯 / 有道 / Google / DeepL / 大模型），要翻译的文本会发到那些第三方服务器。';
+    el.style.color = '';
+    return;
+  }
+  const cur = PROVIDERS.find(p=>p.id===CFG.provider);
+  const base = '已开启：只允许"请求不出本机"的节点（内置引擎 / 本地大模型 / 本机 LibreTranslate / 仅用缓存），所有对外请求都会被拦下。' +
+    '例外：内置引擎首次要下载约 200 MB 语言包，那次下载会联网（只下模型本身，不发送任何要翻译的文本）。';
+  if (cur && cur.local === false){
+    el.textContent = base + `当前选的是 ${cur.name}，它会被停用 —— 请改选一个本地节点。`;
+    el.style.color = 'var(--g-warn, #b45309)';
+  } else {
+    el.textContent = base;
+    el.style.color = '';
+  }
+}
+
+/** 按当前选中的节点渲染它的参数（需要密钥的节点才有：DeepL / OpenAI 兼容 / LibreTranslate） */
+function renderProviderFields(){
+  const p = PROVIDERS.find(x=>x.id===CFG.provider);
+  const fields = (p && p.fields) || [];
+  const box = $('srcFields');
+  const grid = $('srcFieldsGrid');
+  if (!fields.length){ box.style.display = 'none'; grid.innerHTML = ''; return; }
+  box.style.display = '';
+  $('srcFieldsTitle').textContent = `${p.name} 的参数`;
+  grid.innerHTML = '';
+  for (const f of fields){
+    const wrap = document.createElement('div');
+    const lab = document.createElement('label');
+    lab.textContent = f.label;
+    const inp = document.createElement('input');
+    inp.type = f.type === 'password' ? 'password' : 'text';
+    inp.dataset.key = f.key;
+    inp.placeholder = f.placeholder || '';
+    inp.value = CFG[f.key] ?? '';
+    inp.autocomplete = 'off';
+    inp.spellcheck = false;
+    wrap.append(lab, inp);
+    grid.appendChild(wrap);
+  }
+  const secret = fields.find(f=>f.type === 'password');
+  $('fieldsOut').textContent = secret && !CFG[secret.key] ? '⚠ 还没填密钥，保存后点「测试当前节点」验证' : '';
+  refreshLocalEngine();
+}
+
+// ---------------------------------------------------------------- 内置引擎（模型跑在插件拉起的无窗口 Edge 里）
+let localTimer = null;
+let localTimerMs = 0;
+// 进度行的文案逐段取词，这样中/英文界面下都对（见 core/i18n.js）。
+// 故意用函数声明而不是 const 箭头：函数声明会提升，避免"先渲染后定义"时的 TDZ 崩溃。
+function T(s){ return window.GALE_I18N ? window.GALE_I18N.t(s) : s; }
+
+/** 字节 / 时长的可读格式。
+ *  注意：内置引擎的进度是**估算值** —— Translator API 只给 0~1 的百分比（total 恒为 1），
+ *  拿不到字节数，所以 MB 与速度是按语言包体积换算出来的（见 core/inject.js 的 LOCAL_PACK_BYTES）。 */
+function fmtBytes(n){
+  const v = Number(n) || 0;
+  if (v >= 1048576) return (v/1048576).toFixed(1) + ' MB';
+  if (v >= 1024) return Math.round(v/1024) + ' KB';
+  return Math.round(v) + ' B';
+}
+function fmtSecs(ms){
+  const s = Math.max(0, Math.round((Number(ms)||0)/1000));
+  // ' 秒' / ' 分' 里的前导空格是给中文留的（英文译文会把它去掉，变成 3s / 1m 30s）
+  if (s < 60) return s + T(' 秒');
+  return Math.floor(s/60) + T(' 分') + ' ' + (s%60) + T(' 秒');
+}
+
+/** 渲染下载进度：进度条 + 已下载量 / 速度 / 已用时间 / 预计剩余 */
+function renderLocalProgress(pr){
+  const wrap = $('localProgWrap'), bar = $('localBar'), fill = $('localBarFill'), text = $('localProgText');
+  if (!wrap || !bar || !fill || !text) return;
+  if (!pr){ wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+  const started = pr.hasProgress !== false; // false = 还没收到任何进度事件
+  const pct = Math.max(0, Math.min(100, Math.round((pr.progress||0)*100)));
+  // 还没开始有进度时用"不确定态"的滑动条，不假装知道百分比
+  bar.classList.toggle('indet', !started);
+  fill.style.width = started ? Math.max(1, pct) + '%' : '';
+  const seg = [];
+  if (started){
+    seg.push(`${T('约')} ${fmtBytes(pr.downloadedBytes)} / ${fmtBytes(pr.totalBytes)}`);
+    if (pr.speedBps > 0) seg.push(`${T('约')} ${fmtBytes(pr.speedBps)}/s`);
+    seg.push(`${T('已用')} ${fmtSecs(pr.elapsedMs)}`);
+    if (pr.etaMs) seg.push(`${T('剩余约')} ${fmtSecs(pr.etaMs)}`);
+  } else {
+    seg.push(T('正在连接下载服务器'));
+    seg.push(`${T('已用')} ${fmtSecs(pr.elapsedMs)}`);
+  }
+  text.textContent = seg.join(' · ');
+  text.title = T('浏览器只给百分比进度，MB 与速度是按语言包体积（约 197.5 MB）换算的估算值');
+}
+
+function stopLocalTimer(){ if (localTimer){ clearInterval(localTimer); localTimer = null; } localTimerMs = 0; }
+/** 统一定时器管理：下载中用 700ms（下得快，2 秒会让进度条几乎不动），
+ *  等 Gale 连上时用 2000ms（自愈重试，不用用户手点）。
+ *  ⚠️ 间隔要单独存变量 —— setInterval 返回的是**数字**，给数字加属性在严格模式下会抛 TypeError。 */
+function startLocalTimer(ms){
+  if (localTimer && localTimerMs === ms) return;
+  stopLocalTimer();
+  localTimer = setInterval(()=>refreshLocalEngine().catch(()=>{}), ms);
+  localTimerMs = ms;
+}
+/** 按状态决定按钮可不可用（不要因为"没连上"就把「启用」藏起来，那样用户没法下载） */
+function setLocalBtns({ enable, reset }){
+  const eb = $('btnEnableLocal'), rb = $('btnResetLocal');
+  if (eb){ eb.style.display=''; eb.disabled = !enable; eb.style.opacity = enable ? '' : '.5'; }
+  if (rb){ rb.style.display=''; rb.disabled = !reset; rb.style.opacity = reset ? '' : '.5'; }
+}
+function showLocalDiag(text){
+  const d = $('localDiag'); if (!d) return;
+  d.style.display = text ? '' : 'none';
+  d.textContent = text || '';
+}
+
+async function refreshLocalEngine(){
+  const box = $('localBox');
+  if (!box) return;
+  if (CFG.provider !== 'builtin'){
+    box.style.display = 'none';
+    renderLocalProgress(null); stopLocalTimer();
+    return;
+  }
+  box.style.display = '';
+  try {
+    const q = `?source=${encodeURIComponent(CFG.source || 'auto')}&target=${encodeURIComponent(CFG.target || 'zh-CN')}`;
+    const st = await api('/api/local-engine' + q);
+
+    // ① 还没连上 Gale —— 最容易被误读成"未下载"的一种情况，必须说清楚并自动重试
+    if (st.bridgeDown){
+      $('localState').textContent = st.galeRunning === false
+        ? '⚠ 还没连接到 Gale：Gale 当前没有运行。启动 Gale 后这里会自动恢复。'
+        : '⚠ 还没连接到 Gale 页面，正在自动重试…';
+      showLocalDiag(st.reason || '');
+      setLocalBtns({ enable:false, reset:false });
+      renderLocalProgress(null);
+      startLocalTimer(2000);
+      applyI18n(); return;
+    }
+    // ② 浏览器真的不支持
+    if (!st.supported){
+      $('localState').textContent = '⚠ ' + (st.reason || '当前浏览器不支持内置引擎');
+      showLocalDiag('');
+      setLocalBtns({ enable:false, reset:false });
+      renderLocalProgress(null); stopLocalTimer();
+      applyI18n(); return;
+    }
+
+    const pr = st.preparing || null;
+    const pairsText = Object.entries(st.pairs || {}).map(([k,v])=>`${k}=${v}`).join(' · ');
+    // worker 没启动时后端只能靠磁盘推断，pairs 是空的 —— 别显示成"当前语言对 en>zh："后面空一片
+    const pairLine = pairsText ? `当前语言对 ${st.wantKey}：${pairsText}` : '';
+    const workerErr = st.worker && st.worker.lastError ? `本地翻译后端启动失败：${st.worker.lastError}` : '';
+
+    // ③ 运行环境不提供端侧模型（Gale 用的 WebView2 就是）——这是环境限制，不是"语言包没下载"。
+    //    以前会掉进最后的 else，显示"还没下载"并放开「启用」按钮，点了毫无反应。
+    if (st.unusable){
+      $('localState').textContent = '⛔ ' + (st.reason || '当前运行环境不提供端侧翻译模型，内置引擎无法使用');
+      $('localOut').textContent = '';
+      setLocalBtns({ enable:false, reset:false });
+      // 后端启动失败（比如无窗口 Edge 起不来）比"语言对状态"更值得说，优先摆出来
+      showLocalDiag(workerErr || pairLine);
+      renderLocalProgress(null); stopLocalTimer();
+      applyI18n(); return;
+    }
+
+    if (st.ready){
+      // 后端可能是 Gale 页面自己，也可能是插件拉起的无窗口 Edge（WebView2 不提供端侧模型时的正解）
+      $('localState').textContent = st.backend === 'edge'
+        ? '✅ 语言包已就绪：本地运行、不联网、不消耗任何额度（模型跑在插件拉起的无窗口 Edge 里，用的是系统安装的 Edge）'
+        : '✅ 语言包已就绪：本地运行、不联网、不消耗任何额度';
+      $('localOut').textContent = '';
+      setLocalBtns({ enable:false, reset:true });
+      showLocalDiag(pairLine);
+      renderLocalProgress(null); stopLocalTimer();
+    } else if (pr){
+      $('localState').textContent = pr.hasProgress === false
+        ? '正在准备内置引擎（连接下载服务器）…'
+        : `正在下载语言包… ${Math.round((pr.progress||0)*100)}%`;
+      setLocalBtns({ enable:false, reset:false });
+      showLocalDiag(st.lastError ? '上次错误：' + st.lastError : pairLine);
+      renderLocalProgress(pr);
+      startLocalTimer(700);
+    } else {
+      $('localState').textContent = st.stalePack
+        ? '⚠ 语言包文件不完整（可能被删过或上次没下完）：点「启用内置引擎」会清掉旧数据重新装好（约 200 MB）'
+        : '语言包还没下载：首次启用约需下载 200 MB（一次性，之后一直可用）';
+      setLocalBtns({ enable:true, reset:false });
+      // 失败过就把原因摆出来，别让用户对着"未下载"猜
+      showLocalDiag(workerErr ? workerErr : (st.lastError ? '上次下载失败：' + st.lastError : pairLine));
+      renderLocalProgress(null); stopLocalTimer();
+    }
+    applyI18n();
+  } catch(e){
+    $('localState').textContent = '状态获取失败：' + e.message;
+    renderLocalProgress(null);
+    applyI18n();
+  }
+}
+
+function fillForms(){
+  $('galePath').value = CFG.galePath||'';
+  $('proxy').value = CFG.proxy||'';
+  $('fallback').value = (CFG.fallback||[]).join(', ');
+  $('minLen').value = CFG.minLen ?? 3;
+  $('translateNames').value = String(!!CFG.translateNames);
+  $('translateConfigPage').value = String(CFG.translateConfigPage !== false);
+  $('chineseSearch').value = String(CFG.chineseSearch !== false);
+  $('fuzzyReuse').value = String(CFG.fuzzyReuse !== false);
+  $('offlineOnly').checked = !!CFG.offlineOnly;
+  const q = CFG.quality || {};
+  const po = CFG.polish || {};
+  $('qMode').value = q.mode === 'best' ? 'best' : 'fast';
+  $('qVoters').value = (q.voters||[]).join(', ');
+  $('qConsistency').value = String(q.consistency !== false);
+  $('polishEnabled').value = String(!!po.enabled);
+  $('polishMinLen').value = po.minLen ?? 10;
+  $('polishBatch').value = po.batchSize ?? 8;
+  renderQualityState();
+  $('hoverOriginal').value = String(CFG.hoverOriginal !== false);
+  $('autoLaunchGale').value = String(CFG.autoLaunchGale !== false);
+  $('glossary').value = (CFG.glossary||[]).map(g=> typeof g==='string'? g : `${g.from} = ${g.to||''}`).join('\n');
+  $('phraseMap').value = Object.entries(CFG.phraseMap||{}).map(([k,v])=>`${k} = ${v}`).join('\n');
+  $('postReplace').value = (CFG.postReplace||[]).map(r=>`${r.from} = ${r.to??''}`).join('\n');
+  $('target').value = CFG.target||'zh-CN';
+  $('source').value = CFG.source||'auto';
+  $('uiLang').value = CFG.uiLang === 'en' ? 'en' : 'zh-CN';
+  applyI18n();
+}
+
+/** 界面语言：把所有中文文案按词典翻成英文（含动态生成的部分） */
+function applyI18n(){
+  if (!I18N) return;
+  try { I18N.apply(document); } catch {}
+}
+
+async function refreshConfig(){
+  const c = await api('/api/client-config');
+  PROVIDERS = c.providers||[];
+  const full = await api('/api/config');
+  CFG = Object.assign({}, c.config, full.config);
+  renderProviders(); fillForms();
+}
+
+function renderStatus(s){
+  const c = s.cdp||{};
+  if (s.version) $('ver').textContent = 'v' + s.version;
+  const dot = (ok, warn) => `<span class="dot ${ok?'ok':(warn?'warn':'err')}"></span>`;
+  const cur = PROVIDERS.find(p=>p.id===s.provider);
+  $('stats').innerHTML = `
+    <div>${dot(true)}服务<b>正常运行</b>端口 ${s.servicePort}</div>
+    <div>${dot(c.connected&&c.attached, s.galeRunning)}Gale 挂载<b>${c.attached?'已连接':(s.galeRunning?'未挂载':'未运行')}</b>调试端口 ${s.cdpPort??'-'}${s.cdpPortRemembered?` · 记忆 ${s.cdpPortRemembered}`:''}${(!c.attached&&c.lastError)?(' · '+c.lastError):''}</div>
+    <div>${dot(true)}当前节点<b>${cur?cur.name:s.provider}</b></div>
+    <div>${dot(true)}缓存<b>${s.cache?.size??0} 条</b></div>
+    <div>${dot(true)}累计翻译<b>${s.stats?.items??0} 段</b></div>
+    <div>${dot(true)}模糊复用<b>${s.stats?.fuzzyHits??0} 段</b></div>`;
+  $('portNote').style.display = s.cdpPortNote ? '' : 'none';
+  if (s.cdpPortNote) $('portNote').textContent = '⚠ ' + s.cdpPortNote;
+
+  // 节点被限流 → 冷却提示 + 一键解除
+  const rl = s.rateLimited || [];
+  const rn = $('rateNote');
+  if (rl.length){
+    rn.style.display = '';
+    rn.innerHTML = '<b>⚠ 节点被限流，正在冷却：</b><br>' + rl.map(x =>
+      `· ${x.id} 还需 ${Math.ceil(x.remainingMs/1000)} 秒` + (x.strikes>1?`（第 ${x.strikes} 次）`:'')).join('<br>')
+      + '<div class="row" style="margin-top:6px"><button class="ghost mini" id="clearRate">解除冷却</button>'
+      + '<span class="hint">冷却期间会自动改用备用节点</span></div>';
+    const btn = $('clearRate');
+    if (btn) btn.onclick = async () => { await api('/api/rate-limit/clear', {}); refresh(); };
+  } else {
+    rn.style.display = 'none';
+  }
+  // 翻译节点可用性告警：内置引擎需要本机有 Edge（模型跑在插件拉起的无窗口 Edge 里），
+  // 若备用链又为空，就会一句都翻不出来 —— 这种状态必须显式告诉用户，而不是静默失败。
+  const nn = $('nodeNote');
+  if (s.nodeWarning){
+    nn.style.display = '';
+    nn.textContent = '⚠ ' + I18N.t('翻译节点不可用：') + s.nodeWarning;
+  } else {
+    nn.style.display = 'none';
+  }
+  applyI18n();
+  $('cacheStats').innerHTML = `<div>条目数<b>${s.cache?.size??0}</b></div><div>命中<b>${s.cache?.hits??0}</b></div><div>未命中<b>${s.cache?.misses??0}</b></div><div>请求<b>${s.stats?.requests??0}</b></div><div>模糊复用<b>${s.stats?.fuzzyHits??0}</b></div><div>错误<b>${s.stats?.errors??0}</b></div>`;
+  $('events').textContent = (s.events||[]).map(e=>`${new Date(e.t).toLocaleTimeString()} [${e.level}] ${e.msg}`).join('\n') || '（无）';
+  const ph = s.pageHealth;
+  const banner = $('healthBanner');
+  if (ph && ph.degraded){
+    banner.style.display = '';
+    const anchors = ph.anchors ? Object.entries(ph.anchors).filter(([,v])=>v).map(([k])=>k).join(', ') || '无' : '未知';
+    $('healthBannerMsg').textContent = (ph.reasons||[]).join('；')
+      + `（已扫描 ${ph.scans??0} 次 · 候选 ${ph.candidates??0} · 命中锚点：${anchors}）`
+      + '。点“看覆盖率体检”可查看当前页面识别到的内容与原因。';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+async function refresh(){ try { renderStatus(await api('/api/status')); } catch(e){} }
+
+$('btnSave').onclick = async () => {
+  let target = $('target').value;
+  if (target === '__custom') target = prompt('请输入目标语言代码，如 zh-CN / en / ja', 'zh-CN') || 'zh-CN';
+  const patch = {
+    galePath: $('galePath').value.trim(),
+    proxy: $('proxy').value.trim(),
+    fallback: $('fallback').value.split(',').map(s=>s.trim()).filter(Boolean),
+    target,
+    source: $('source').value,
+    minLen: Number($('minLen').value)||3,
+    translateNames: $('translateNames').value==='true',
+    translateConfigPage: $('translateConfigPage').value==='true',
+    chineseSearch: $('chineseSearch').value==='true',
+    fuzzyReuse: $('fuzzyReuse').value==='true',
+    offlineOnly: $('offlineOnly').checked,
+    hoverOriginal: $('hoverOriginal').value==='true',
+    autoLaunchGale: $('autoLaunchGale').value==='true',
+    glossary: linesToGlossary($('glossary').value),
+    phraseMap: Object.fromEntries(linesToRules($('phraseMap').value).map(r=>[r.from, r.to])),
+    postReplace: linesToRules($('postReplace').value),
+    quality: {
+      mode: $('qMode').value,
+      voters: $('qVoters').value.split(',').map(s=>s.trim()).filter(Boolean),
+      consistency: $('qConsistency').value === 'true',
+    },
+    polish: {
+      enabled: $('polishEnabled').value === 'true',
+      minLen: Number($('polishMinLen').value) || 10,
+      batchSize: Number($('polishBatch').value) || 8,
+    },
+  };
+  CFG = Object.assign(CFG, patch);
+  await api('/api/config', patch);
+  // 软应用：不刷新页面也能生效；失败才退回刷新
+  let applied = { ok: false };
+  try { applied = await api('/api/apply', {}); } catch(e){}
+  if (!applied.ok) await api('/api/reinject', {reload:true});
+  toast(applied.ok ? '已保存并生效' : '已保存并刷新 Gale 页面');
+  setTimeout(()=>{ refreshConfig().catch(()=>{}); refresh(); }, 1200);
+};
+$('btnAddCustom').onclick = async () => {
+  const id = $('cs_id').value.trim().replace(/\s+/g,'-');
+  if (!$('cs_name').value.trim() || !id || !$('cs_url').value.trim()) return toast('名称、id、请求地址都要填');
+  const editing = $('btnAddCustom').dataset.editing;
+  const item = { id, name: $('cs_name').value.trim(), url: $('cs_url').value.trim(), method: $('cs_method').value,
+    headers: $('cs_headers').value, body: $('cs_body').value, responsePath: $('cs_path').value.trim(),
+    key: $('cs_key').value, batch: $('cs_batch').value==='true', note: $('cs_note').value, enabled: true };
+  const list = (CFG.customSources||[]).filter(x=>x.id!==(editing||id));
+  list.push(item);
+  CFG.customSources = list;
+  await api('/api/config',{customSources:list});
+  $('btnAddCustom').textContent='添加节点'; delete $('btnAddCustom').dataset.editing;
+  for (const f of ['cs_name','cs_id','cs_url','cs_path','cs_key','cs_note']) $(f).value='';
+  $('addBox').open = false;
+  await refreshConfig(); toast('节点已保存');
+};
+$('btnRestore').onclick = async () => { await api('/api/config',{disabledSources:[]}); await refreshConfig(); toast('已恢复内置节点'); };
+$('btnSaveFields').onclick = async () => {
+  const patch = {};
+  for (const inp of $('srcFieldsGrid').querySelectorAll('input[data-key]')) patch[inp.dataset.key] = inp.value.trim();
+  if (!Object.keys(patch).length) return;
+  await api('/api/config', patch);
+  Object.assign(CFG, patch);
+  renderProviderFields();
+  $('fieldsOut').textContent = '已保存，可点「测试当前节点」验证';
+  toast('参数已保存');
+};
+/** 真正发起一次语言包下载（「启用内置引擎」和「下载语言包」共用同一条路） */
+async function startLocalDownload(){
+  $('localOut').textContent = '已开始下载，请稍候…';
+  $('localState').textContent = '正在准备内置引擎（连接下载服务器）…';
+  renderLocalProgress({ progress: 0, hasProgress: false, elapsedMs: 0, speedBps: 0, etaMs: null });
+  startLocalTimer(700);
+  applyI18n();
+  try {
+    const r = await api('/api/local-engine/prepare', { source: CFG.source || 'auto', target: CFG.target || 'zh-CN' });
+    if (r && r.ok === false){
+      // 服务端明确说没开始（比如 Gale 没连上 / 本机没有 Edge），别让界面空转
+      $('localOut').textContent = '启用失败：' + (r.error || '未知原因');
+      stopLocalTimer();
+      refreshLocalEngine().catch(()=>{});
+      applyI18n();
+    }
+  } catch(e){
+    $('localOut').textContent = '启用失败：' + e.message;
+    stopLocalTimer();
+    applyI18n();
+  }
+}
+$('btnEnableLocal').onclick = async () => {
+  await startLocalDownload();
+};
+// 「下载语言包」：语言包没齐就真的去下（以前只做一次状态重读，按下去没有任何反应）
+$('btnRecheckLocal').onclick = async () => {
+  $('localOut').textContent = '';
+  applyI18n();
+  let st = null;
+  try {
+    st = await api('/api/local-engine');
+  } catch (e) {
+    $('localOut').textContent = '读取状态失败：' + e.message;
+    return;
+  }
+  if (st && st.ready) { $('localOut').textContent = '语言包已就绪，不需要重新下载'; refreshLocalEngine().catch(()=>{}); return; }
+  if (st && st.preparing) { $('localOut').textContent = '语言包正在下载中，请稍候…'; startLocalTimer(700); return; }
+  if (st && st.unusable) {
+    $('localOut').textContent = '无法下载：' + (st.reason || '当前环境不提供端侧翻译模型');
+    refreshLocalEngine().catch(()=>{});
+    applyI18n();
+    return;
+  }
+  await startLocalDownload();
+};
+$('btnResetLocal').onclick = async () => {
+  $('localOut').textContent = '正在重置…';
+  applyI18n();
+  try {
+    const r = await api('/api/local-engine/reset', {});
+    $('localOut').textContent = r.ok
+      ? (r.downloading ? '已重置（语言包还在下载，未打断）' : `已重置：清掉 ${r.cleared||0} 个模型实例，下次翻译会重新创建`)
+      : '重置失败：' + (r.error || '未知原因');
+    refreshLocalEngine().catch(()=>{});
+    applyI18n();
+  } catch(e){
+    $('localOut').textContent = '重置失败：' + e.message;
+    applyI18n();
+  }
+};
+function fmtMB(bytes){ return (Number(bytes||0)/1048576).toFixed(1) + ' MB'; }
+$('btnScanPack').onclick = async () => {
+  $('localPackInfo').textContent = '正在扫描…';
+  applyI18n();
+  try {
+    const r = await api('/api/local-engine/pack');
+    // 插件拉起的无窗口 Edge 那份要单独说：语言包只是 profile 的一部分，profile 里还有 Edge 自己的
+    // 组件缓存（能长到几百 MB），而删除是整个 profile 一起删 —— 两个数都要摆出来。
+    const wp = r.workerProfile || null;
+    const seed = r.seed || null;
+    const edge = r.edge || null;
+    const parts = [];
+    if (wp && wp.bytes > 0){
+      parts.push(`插件拉起的无窗口 Edge 数据目录 ${wp.path}：${fmtMB(wp.bytes)}` + (wp.packInstalled ? `（其中语言包 ${fmtMB(wp.packBytes)}）` : '（里面没有语言包）'));
+    }
+    const others = (r.dirs || []).filter(d => !wp || !String(d.path).toLowerCase().startsWith(String(wp.path).toLowerCase()));
+    for (const d of others) parts.push(`${d.path}（${fmtMB(d.bytes)}）`);
+    if (seed && seed.ready){
+      parts.push(`随包自带语言包 ${seed.path}：${fmtMB(seed.bytes)}` + (seed.runtime ? '（下次点「启用内置引擎」直接铺开，不用联网）' : '（缺少模型运行时 EdgeLLMRuntime，本次不能用来铺开）'));
+    }
+    if (edge && edge.available === false){
+      parts.push('这台机器上没有找到 Microsoft Edge，内置引擎用不了（可以改用「本地大模型」或「本机 LibreTranslate」，或换个在线节点）');
+    }
+    if (!parts.length){
+      $('localPackInfo').textContent = '没有在磁盘上找到已下载的语言包（可能还没下载，或不在已知的 profile 目录里）。';
+    } else {
+      const total = (wp && wp.bytes > 0 ? wp.bytes : 0) + (seed && seed.ready ? seed.bytes || 0 : 0) + others.reduce((a,d)=>a+d.bytes,0);
+      $('localPackInfo').textContent = `合计占用 ${fmtMB(total)}：` + parts.join('；');
+    }
+    applyI18n();
+  } catch(e){
+    $('localPackInfo').textContent = '扫描失败：' + e.message;
+    applyI18n();
+  }
+};
+// 破坏性操作：按钮上的两步确认（不用原生 confirm，行为和抽屉保持一致）
+let delArmed = false, delArmTimer = null;
+$('btnDelPack').onclick = async () => {
+  const btn = $('btnDelPack');
+  if (!delArmed){
+    delArmed = true;
+    btn.textContent = '再点一次确认删除';
+    btn.style.color = 'var(--g-err)';
+    $('localPackInfo').textContent = '将清空插件拉起的无窗口 Edge 数据目录（语言包就在里面）。删完再点「启用内置引擎」会自动装回来：没装过的话约 200 MB、实测十几秒下完。如果磁盘上还有 Gale 自己那份语言包，也会一并删掉（那份需要先关掉 Gale）。想先看一眼位置、或者只删某一处，用旁边的「打开语言包位置」。此操作不可撤销。';
+    applyI18n();
+    clearTimeout(delArmTimer);
+    delArmTimer = setTimeout(()=>{ delArmed = false; btn.textContent = '删除语言包'; btn.style.color = ''; $('localPackInfo').textContent = '已取消。'; applyI18n(); }, 8000);
+    return;
+  }
+  delArmed = false;
+  clearTimeout(delArmTimer);
+  btn.textContent = '删除语言包';
+  btn.style.color = '';
+  $('localPackInfo').textContent = '正在删除…';
+  applyI18n();
+  try {
+    const r = await api('/api/local-engine/pack/delete', { confirm: true, scope: 'all' });
+    if (!r.ok) $('localPackInfo').textContent = '删除失败：' + (r.error || '未知原因');
+    else if (!r.removed || !r.removed.length) $('localPackInfo').textContent = r.note || '没有找到可删除的语言包。';
+    else {
+      const tail = r.seedDeleted
+        ? '（连随包自带的那份也一起删了。）'
+        : '下次用内置引擎会自动装回来（没装语言包时约 200 MB，实测十几秒下完）。';
+      $('localPackInfo').textContent = `已清理 ${r.removed.length} 处，释放 ${fmtMB(r.freedBytes)}。` + tail + (r.failed ? `（${r.failed} 处失败）` : '');
+    }
+    refreshLocalEngine().catch(()=>{});
+    applyI18n();
+  } catch(e){
+    $('localPackInfo').textContent = '删除失败：' + e.message;
+    applyI18n();
+  }
+};
+// 「打开语言包位置」：在资源管理器里把语言包所在目录摊开，方便自己看/手动删；不用关 Gale
+$('btnOpenPack').onclick = async () => {
+  $('localPackInfo').textContent = '正在打开语言包所在目录…';
+  applyI18n();
+  try {
+    const r = await api('/api/local-engine/pack/open', {});
+    $('localPackInfo').textContent = r.ok ? `已在资源管理器里打开：${r.opened}` : `打开失败：${r.error || '未知原因'}（位置：${r.opened || '-'}）`;
+  } catch(e){
+    $('localPackInfo').textContent = '打开失败：' + e.message;
+  }
+  applyI18n();
+};
+$('btnTest').onclick = async () => {
+  const p = PROVIDERS.find(x=>x.id===CFG.provider);
+  const secret = ((p && p.fields) || []).find(f=>f.type === 'password');
+  if (secret && !CFG[secret.key]) { $('testOut').textContent = `请先填写 ${secret.label} 并保存`; return; }
+  $('testOut').textContent = '测试中…';
+  const r = await api('/api/test-provider', {provider: CFG.provider});
+  $('testOut').textContent = r.ok ? `成功 ${r.ms}ms：${r.results.join(' / ')}` : `失败：${r.error}`;
+};
+$('btnDetect').onclick = async () => {
+  $('testOut').textContent = '正在检测…';
+  const r = await api('/api/detect-gale', {});
+  if (r.ok) { $('galePath').value = r.path; CFG.galePath = r.path; $('testOut').textContent=''; toast('已找到：'+r.path); }
+  else { $('testOut').textContent=''; toast('没找到 gale.exe，请手工填写路径'); }
+};
+$('btnSysProxy').onclick = async () => {
+  $('proxy').value = 'system'; CFG.proxy = 'system';
+  await api('/api/config',{proxy:'system'});
+  toast('已设为跟随系统代理');
+};
+$('btnDetectProxy').onclick = async () => {
+  const out = $('proxyOut');
+  out.textContent = '正在探测系统代理与常见端口…';
+  try {
+    const r = await api('/api/detect-proxy', {});
+    const list = (r.candidates||[]).map(c => `${c.ok?'✅':'❌'} ${c.url}${c.ok?` （${c.ms}ms${c.kind==='socks5'?' SOCKS5':''}）`:` ${c.error}`}`).join('<br>');
+    out.innerHTML = `系统代理：${r.system || '未启用'}${r.pac?` · PAC：${r.pac}`:''}<br>${list || '未发现本地代理端口'}`;
+    const best = (r.candidates||[]).find(c => c.ok);
+    if (best) {
+      $('proxy').value = best.url; CFG.proxy = best.url;
+      await api('/api/config',{proxy:best.url});
+      toast('已填入可用代理：' + best.url);
+    } else {
+      toast('没有可用代理，请确认梯子已开启');
+    }
+  } catch(e) {
+    out.textContent = '探测失败：' + e.message;
+  }
+};
+$('btnClearCache').onclick = async () => { await api('/api/cache/clear',{}); toast('缓存已清空'); refresh(); };
+$('btnReinject').onclick = async () => { const r = await api('/api/reinject',{reload:true}); toast(r.ok?'已重新注入并刷新页面':'注入失败：'+r.error); setTimeout(refresh, 2500); };
+$('btnReinject2').onclick = () => $('btnReinject').onclick();
+$('btnHealthBanner').onclick = () => { $('healthBanner').style.display = 'none'; healthOne(); };
+$('btnLaunch').onclick = async () => { await api('/api/launch-gale',{}); toast('已尝试启动 Gale'); refresh(); };
+$('btnDiag').onclick = async () => {
+  const r = await api('/api/diag');
+  const out = $('diagOut'); out.style.display='block';
+  out.textContent = r.ok ? JSON.stringify(r.diag,null,2) : ('失败：'+r.error);
+};
+
+// ---------------- 免启动器模式
+async function refreshSystem(){
+  try {
+    const s = await api('/api/system/status');
+    $('sysState').innerHTML =
+      `<span>桌面快捷方式</span> <span>${s.userShortcut?'已创建':'未创建'}</span>` +
+      `<span> · 开机自启</span> <span>${s.autostart?'已开启':'未开启'}</span>` +
+      (s.hijackedCount?`<span> · 已接管 ${s.hijackedCount} 个原快捷方式</span>`:'');
+    I18N.apply(document);
+  } catch {}
+}
+async function sysAction(pathname, body, label){
+  const out = $('sysOut'); out.style.display='block'; out.textContent = label+'…';
+  try {
+    const r = await api(pathname, body);
+    out.textContent = JSON.stringify(r, null, 2);
+    toast(r.ok===false ? ('失败：'+(r.error||'')) : (label+'完成'));
+    refreshSystem();
+  } catch(e){ out.textContent = '失败：'+e.message; }
+}
+$('btnSystemOn').onclick = () => sysAction('/api/system/shortcut', {enable:true}, '开启免启动器模式');
+$('btnSystemOff').onclick = () => sysAction('/api/system/shortcut', {enable:false}, '还原');
+$('btnAutostartOn').onclick = () => sysAction('/api/system/autostart', {enable:true}, '开启开机自启');
+$('btnAutostartOff').onclick = () => sysAction('/api/system/autostart', {enable:false}, '关闭开机自启');
+
+// ---------------- 覆盖率体检
+const REASON_LABEL = {
+  translated:'已翻译', untranslated:'⚠ 未翻译（可点“翻译它”）', 'mod-name':'模组名/作者名（保留）',
+  identifier:'标识符/路径/文件名（保留）', 'ui-chrome':'界面框架（跳过）', code:'代码块（跳过）',
+  glossary:'术语表保护', phrase:'固定译法', forced:'你点名翻译', 'too-short':'太短（跳过）',
+  link:'链接文字（保留）', mojibake:'乱码文本（跳过）', pending:'翻译中', failed:'翻译失败（会自动重试）',
+  unchanged:'机翻未改动（可“指定译法”）',
+};
+function renderHealth(list){
+  const box = $('healthOut'); box.innerHTML = '';
+  for (const cov of list){
+    const card = document.createElement('div');
+    card.style.cssText = 'border:1px solid var(--g-line);border-radius:var(--g-r-sm);padding:10px 12px;margin-bottom:10px';
+    const rows = Object.entries(cov.counts).sort((a,b)=>b[1]-a[1])
+      .map(([k,v])=>`<span style="margin-right:14px">${REASON_LABEL[k]||k}：<b>${v}</b></span>`).join('');
+    card.innerHTML = `<div style="margin-bottom:6px"><b>${cov.route}</b> <span class="hint">模式 ${cov.mode}</span></div><div class="hint" style="margin-bottom:8px">${rows}</div>`;
+    const un = [...(cov.samples && cov.samples.untranslated || []), ...(cov.samples && cov.samples.unchanged || [])];
+    if (un.length){
+      const wrap = document.createElement('div');
+      for (const text of [...new Set(un)]){
+        const row = document.createElement('div');
+        row.className = 'row'; row.style.marginBottom = '4px';
+        const span = document.createElement('span');
+        span.className = 'hint'; span.style.flex = '1'; span.textContent = text;
+        const b1 = document.createElement('button'); b1.className='mini'; b1.textContent='翻译它';
+        const b2 = document.createElement('button'); b2.className='ghost mini'; b2.textContent='指定译法';
+        const b3 = document.createElement('button'); b3.className='ghost mini'; b3.textContent='保护它';
+        b1.onclick = () => addForce(text);
+        b2.onclick = () => {
+          const val = prompt('把「' + text + '」固定翻译成：', '');
+          if (val) addPhrase(text, val);
+        };
+        b3.onclick = () => addGlossary(text);
+        row.append(span, b1, b2, b3); wrap.appendChild(row);
+      }
+      card.appendChild(wrap);
+    }
+    box.appendChild(card);
+  }
+}
+async function addForce(text){
+  const list = [...new Set([...(CFG.forceTranslate||[]), text])];
+  CFG.forceTranslate = list;
+  await api('/api/config', { forceTranslate: list });
+  await api('/api/reinject', { reload:true });
+  toast('已加入"强制翻译"，正在刷新页面'); setTimeout(()=>{ refreshConfig().catch(()=>{}); healthOne(); }, 3000);
+}
+async function addGlossary(text){
+  const list = [...new Set([...(CFG.glossary||[]).map(g=> typeof g==='string'?g:g.from), text])];
+  CFG.glossary = list;
+  await api('/api/config', { glossary: list });
+  await api('/api/reinject', { reload:true });
+  toast('已加入术语保护表'); setTimeout(()=>{ refreshConfig().catch(()=>{}); healthOne(); }, 3000);
+}
+async function addPhrase(from, to){
+  const map = Object.assign({}, CFG.phraseMap || {}, { [from]: to });
+  CFG.phraseMap = map;
+  await api('/api/config', { phraseMap: map });
+  await api('/api/reinject', { reload:true });
+  toast('已加入固定译法：' + from + ' = ' + to);
+  setTimeout(()=>{ refreshConfig().catch(()=>{}); healthOne(); }, 3000);
+}
+async function healthOne(){
+  $('healthHint').textContent = '体检中…';
+  const r = await api('/api/coverage');
+  $('healthHint').textContent = r.ok ? '' : ('失败：'+r.error);
+  if (r.ok) renderHealth([r.coverage]);
+}
+$('btnHealth').onclick = healthOne;
+$('btnHealthAll').onclick = async () => {
+  $('healthHint').textContent = '正在逐个页面体检（Gale 会自动翻页，结束后回到原页面）…';
+  const r = await api('/api/coverage-all', {});
+  $('healthHint').textContent = r.ok ? '' : ('失败：'+(r.error||''));
+  renderHealth(r.results || []);
+};
+
+// ---------------- 译文质量 / 择优 / 润色
+function renderQualityState(){
+  const q = CFG.quality || {};
+  const voters = (q.voters||[]).join(', ');
+  $('qState').textContent = (q.mode === 'best' ? '择优模式' + (voters ? '：'+voters : '：自动') : '快速模式')
+    + ((CFG.polish||{}).enabled ? ' · LLM 润色开' : '');
+}
+$('btnCompare').onclick = async () => {
+  const text = $('cmpText').value.trim();
+  if (!text) return;
+  const out = $('cmpOut');
+  out.innerHTML = '<span class="hint">翻译中（会依次调用所有可用节点）…</span>';
+  try {
+    const r = await api('/api/compare', { text, verify: $('cmpVerify').checked });
+    const rows = (r.results||[]).map(x => `<tr><td style="padding:3px 8px 3px 0"><b>${x.score}</b></td><td style="padding-right:10px">${x.provider}</td><td>${x.dst}</td><td class="hint" style="padding-left:10px">${(x.reasons||[]).join('；')}${x.back?`<br>回译：${x.back}`:''}</td></tr>`).join('');
+    const fail = (r.failed||[]).map(x => `<div class="hint">✗ ${x.provider}：${x.error}</div>`).join('');
+    out.innerHTML = `<table style="width:100%;border-collapse:collapse">${rows}</table>${fail}`;
+  } catch(e) { out.textContent = '失败：' + e.message; }
+};
+$('btnPolishTest').onclick = async () => {
+  $('polishOut').textContent = '测试中…';
+  const r = await api('/api/polish/test', {});
+  $('polishOut').textContent = r.ok ? ('结果：' + r.result) : ('失败：' + r.error);
+};
+
+// ---------------- 公共译库
+async function refreshLibrary(){
+  try {
+    const s = await api('/api/library/stats');
+    const games = Object.entries(s.byGame||{}).map(([g,n])=>`${g} ${n}`).join('、') || '—';
+    $('libState').textContent = `译库 ${s.size} 条 · 已命中 ${s.hits} 次 · 游戏分布：${games}` + (s.subscriptions?.length?` · 订阅 ${s.subscriptions.length} 个`:'');
+    if (s.subscriptions?.length && !$('libSubs').value) $('libSubs').value = s.subscriptions.join('\n');
+    if (s.lastImport) $('libSubOut').textContent = `上次导入：+${s.lastImport.added} 条（跳过 ${s.lastImport.skipped}）`;
+  } catch {}
+}
+$('btnLibExport').onclick = async () => {
+  $('libOut').textContent = '导出中…';
+  const r = await api('/api/library/export', {
+    target: $('libTarget').value.trim(),
+    game: $('libGame').value.trim(),
+    includeCache: $('libIncludeCache').value === 'true',
+  });
+  $('libOut').textContent = r.ok ? `已导出 ${r.count} 条 → ${r.file}（${Math.round(r.bytes/1024)} KB，可直接发给朋友或上传网盘）` : ('失败：' + r.error);
+  refreshLibrary();
+};
+async function doImport(payload, label){
+  $('libSubOut').textContent = label + '…';
+  const r = await api('/api/library/import', payload);
+  $('libSubOut').textContent = r.ok ? `${label}完成：新增 ${r.added} 条，跳过 ${r.skipped}，共 ${r.total} 条` : `${label}失败：${r.error}`;
+  refreshLibrary();
+}
+$('btnLibImport').onclick = () => {
+  const v = $('libImportPath').value.trim();
+  if (!v) return toast('请填写文件路径或网址');
+  doImport({ [v.startsWith('http') ? 'url' : 'path']: v, onlyIfMissing: !$('libOverwrite').checked }, '导入');
+};
+$('libFile').onchange = async (e) => {
+  const f = e.target.files?.[0];
+  if (!f) return;
+  const content = await f.text();
+  doImport({ content, onlyIfMissing: !$('libOverwrite').checked }, '导入文件 ' + f.name);
+};
+$('btnLibSubs').onclick = async () => {
+  const urls = $('libSubs').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  await api('/api/library/subscribe', { url: '', remove: true }); // 清空后重建
+  for (const u of urls) await api('/api/library/subscribe', { url: u });
+  $('libSubOut').textContent = `已保存 ${urls.length} 个订阅，开始拉取…`;
+  for (const u of urls) await doImport({ url: u }, '订阅更新');
+  refreshLibrary();
+};
+$('btnLibClear').onclick = async () => {
+  if (!confirm('确定清空译库？（节点缓存不受影响）')) return;
+  await api('/api/library/clear', {});
+  $('libSubOut').textContent = '译库已清空';
+  refreshLibrary();
+};
+
+$('offlineOnly').onchange = async (e) => {
+  // 这是安全开关：勾上/取消都立刻落盘并生效，不等「保存并生效」按钮。
+  // 理由和抽屉里一样 —— 用户勾完直接关掉页面，下次打开必须还是勾着的状态。
+  // 悬浮栏那边的翻译源列表会在几秒内自己同步（注入脚本里有兜底轮询）。
+  const on = !!e.target.checked;
+  CFG.offlineOnly = on;
+  renderProviders();
+  renderOfflineNote();
+  try {
+    await api('/api/config', { offlineOnly: on });
+    toast(on ? '已开启仅本地翻译并保存（在线节点已停用）' : '已关闭仅本地翻译并保存');
+  } catch (err) {
+    CFG.offlineOnly = !on;
+    e.target.checked = !on;
+    renderProviders();
+    renderOfflineNote();
+    toast('保存失败：' + err.message);
+  }
+};
+
+$('uiLang').onchange = async (e) => {
+  const lang = e.target.value;
+  CFG.uiLang = lang;
+  await api('/api/config', { uiLang: lang });
+  if (I18N) I18N.setLang(lang);
+  applyI18n();
+  toast(lang === 'en' ? 'Switched to English' : '已切换为简体中文');
+};
+
+(async () => {
+  LANGS = (await api('/api/langs')).langs || [];
+  fillLangs();
+  await refreshConfig();
+  if (I18N) {
+    I18N.setLang(CFG.uiLang === 'en' ? 'en' : 'zh-CN');
+    I18N.observe(document.body);
+  }
+  applyI18n();
+  refresh();
+  refreshSystem();
+  refreshLibrary();
+  setInterval(refresh, 4000);
+})().catch(e=>{ document.body.insertAdjacentHTML('afterbegin','<pre>加载配置失败：'+e.message+'</pre>'); });
+</script>
+</body>
+</html>

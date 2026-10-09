@@ -1,0 +1,38 @@
+{
+  "route": "/browse",
+  "mode": "normal",
+  "counts": {
+    "identifier": 2,
+    "mod-name": 6,
+    "translatable": 5,
+    "ui-chrome": 5
+  },
+  "candidates": [
+    "BepInEx pack for Valheim. Preconfigured and includes unstripped Unity DLLs.",
+    "Extract the archive into your BepInEx\\plugins folder, then launch the game.",
+    "Installation",
+    "Plant multiple crops at once and harvest everything with a single click.",
+    "to be installed first."
+  ],
+  "classified": {
+    "identifier": [
+      "BepInExPack Valheim",
+      "Requires"
+    ],
+    "mod-name": [
+      "BepInExPack Valheim",
+      "Libraries",
+      "PlantEasily",
+      "Quality of Life",
+      "by Azumatt",
+      "by denikson"
+    ],
+    "ui-chrome": [
+      "Browse",
+      "Client-side",
+      "Installed",
+      "Modpacks",
+      "Server-side"
+    ]
+  }
+}
