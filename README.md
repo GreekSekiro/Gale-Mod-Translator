@@ -172,4 +172,4 @@ reg delete "HKLM\Software\Policies\Microsoft\Edge\WebView2\AdditionalBrowserArgu
 
 **致谢**：[Gale](https://github.com/kesomannen/gale)（被汉化的对象，外挂只借用它的 WebView2 调试端口）、[Thunderstore](https://thunderstore.io/)（mod 数据来源），以及所有被翻译过的 mod 作者（译文内容的版权归原作者）。
 
-版本历史见 [CHANGELOG.md](CHANGELOG.md)，规划见 [ROADMAP.md](ROADMAP.md)，截图见 [`docs/`](docs)。
+规划见 [ROADMAP.md](ROADMAP.md)，截图见 [`docs/`](docs)。
