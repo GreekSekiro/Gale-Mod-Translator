@@ -9,7 +9,7 @@
 ![依赖](https://img.shields.io/badge/dependencies-0-brightgreen?style=flat-square)
 ![测试](https://img.shields.io/badge/tests-9%20suites%20passing-16a34a?style=flat-square)
 
-![主界面：Gale 的模组列表与详情页，已被实时汉化](02-detail.png)
+![主界面：Gale 的模组列表与详情页，已被实时汉化](docs/02-detail.png)
 
 ## 它是什么（功能与原理）
 
